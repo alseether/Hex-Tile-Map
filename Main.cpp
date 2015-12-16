@@ -100,53 +100,61 @@ void drawPointBetween(sf::RenderTarget* target, std::vector<Hexagon>* hexTileMap
 }
 
 int main(){
-	sf::RenderWindow window(sf::VideoMode(1000, 800), "Hexagon Tile Map");
+	sf::VideoMode videoMode = sf::VideoMode::getFullscreenModes().at(2);
+	sf::RenderWindow window(videoMode, "Hexagon Tile Map");
 	std::vector<int> candidates;
 	std::vector<Hexagon> hexTileMap = generateHexMatrix(SIZEX, SIZEY, SIDE);
 	bool debug = false;
 	int lastSide = SIDE;
 	int sizeX = SIZEX;
 	int sizeY = SIZEY;
-	CheckButton chk(sf::Vector2f(200, 800-89), 15);
+	sf::Font f;
+	f.loadFromFile("arial.ttf");
+
+	/************** Debug Mode Button and Label *****************/
+	sf::CheckButton chk(sf::Vector2f(videoMode.width * 0.75, videoMode.height * 0.1), 15);
+	sf::Text debugModeLabel("Debug Mode ", f);
+	debugModeLabel.setPosition(videoMode.width * 0.77, videoMode.height * 0.0925);
+	debugModeLabel.setCharacterSize(25);
+	/************************************************************/
+
+	/************** Zoom Scroll and Label *****************/
 	std::vector<std::string> elem; 
 	elem.push_back("25");	elem.push_back("50");	elem.push_back("75"); 
 	elem.push_back("100");	elem.push_back("150");	elem.push_back("200");
-	ScrollBar scroll(sf::Vector2f(400, 800-95), sf::Vector2f(120,20), elem);
+	sf::ScrollBar scroll(sf::Vector2f(videoMode.width * 0.75, videoMode.height * 0.2), sf::Vector2f(120, 20), elem, sf::Orientation::HORIZONTAL);
 	scroll.setSelectedIndex(1);
-	sf::Font f;
-	f.loadFromFile("arial.ttf");
-	sf::Text t("Debug Mode ", f);
-	t.setPosition(40, 800 - 100);
-	t.setCharacterSize(25);
-	sf::Text t2("Side ", f);
-	t2.setPosition(400-60, 800 - 100);
-	t2.setColor(sf::Color::White);
-	t2.setCharacterSize(25);
-	sf::Text t3("Rows ", f);
-	t3.setPosition(600, 800 - 100);
-	t3.setColor(sf::Color::White);
-	t3.setCharacterSize(25);
-	sf::Text t4("Cols ", f);
-	t4.setPosition(600, 800 - 50);
-	t4.setColor(sf::Color::White);
-	t4.setCharacterSize(25);
-	sf::Text t5(" +", f);
-	t5.setPosition(680, 800 - 25);
-	t5.setColor(sf::Color::White);
-	t5.setCharacterSize(25);
-	sf::Text t6(" -", f);
-	t6.setPosition(720, 800 - 30);
-	t6.setColor(sf::Color::White);
-	t6.setCharacterSize(25);
-	PlainButton b0(sf::Vector2f(680, 800 - 100), sf::Vector2f(25,25));
-	PlainButton b1(sf::Vector2f(720, 800 - 100), sf::Vector2f(25, 25));
-	PlainButton b2(sf::Vector2f(680, 800 - 50), sf::Vector2f(25, 25));
-	PlainButton b3(sf::Vector2f(720, 800 - 50), sf::Vector2f(25, 25));
+	sf::Text ZoomLabel("Zoom", f);
+	ZoomLabel.setPosition(videoMode.width * 0.825, videoMode.height * 0.196);
+	ZoomLabel.setColor(sf::Color::White);
+	ZoomLabel.setCharacterSize(25);
+	/******************************************************/
+		
+	/************** Add/Delete Row Button and Label *****************/
+	sf::Text addRowLabel("Row +", f);
+	addRowLabel.setPosition(videoMode.width * 0.78, videoMode.height * 0.296);
+	addRowLabel.setColor(sf::Color::White);
+	addRowLabel.setCharacterSize(25);
+	PlainButton addRowButton(sf::Vector2f(videoMode.width * 0.75, videoMode.height * 0.3), sf::Vector2f(25, 25));
+	sf::Text deleteRowLabel("Row -", f);
+	deleteRowLabel.setPosition(videoMode.width * 0.78, videoMode.height * 0.346);
+	deleteRowLabel.setColor(sf::Color::White);
+	deleteRowLabel.setCharacterSize(25);
+	PlainButton deleteRowButton(sf::Vector2f(videoMode.width * 0.75, videoMode.height * 0.35), sf::Vector2f(25, 25));
+	/****************************************************************/
 
-	std::vector<std::string> vector;
-	for (size_t i = 0; i < 100; ++i){
-		vector.push_back(std::to_string(i));
-	}
+	/************** Add/Delete Column Button and Label *****************/
+	sf::Text addColLabel("Col +", f);
+	addColLabel.setPosition(videoMode.width * 0.78, videoMode.height * 0.496);
+	addColLabel.setColor(sf::Color::White);
+	addColLabel.setCharacterSize(25);
+	PlainButton addColButton(sf::Vector2f(videoMode.width * 0.75, videoMode.height * 0.5), sf::Vector2f(25, 25));
+	sf::Text deleteColLabel("Col -", f);
+	deleteColLabel.setPosition(videoMode.width * 0.78, videoMode.height * 0.546);
+	deleteColLabel.setColor(sf::Color::White);
+	deleteColLabel.setCharacterSize(25);
+	PlainButton deleteColButton(sf::Vector2f(videoMode.width * 0.75, videoMode.height * 0.55), sf::Vector2f(25, 25));
+	/*******************************************************************/
 
 	while (window.isOpen()){
 		sf::Event event;
@@ -172,19 +180,19 @@ int main(){
 					chk.toogleMarked();
 					debug = chk.isMarked();
 				}
-				else if (b0.isPointInside(pointer)){
+				else if (addRowButton.isPointInside(pointer)){
 					sizeY++;
 					hexTileMap = generateHexMatrix(sizeX, sizeY, lastSide);
 				}
-				else if (b1.isPointInside(pointer)){
+				else if (deleteRowButton.isPointInside(pointer)){
 					sizeY--;
 					hexTileMap = generateHexMatrix(sizeX, sizeY, lastSide);
 				}
-				else if (b2.isPointInside(pointer)){
+				else if (addColButton.isPointInside(pointer)){
 					sizeX++;
 					hexTileMap = generateHexMatrix(sizeX, sizeY, lastSide);
 				}
-				else if (b3.isPointInside(pointer)){
+				else if (deleteColButton.isPointInside(pointer)){
 					sizeX--;
 					hexTileMap = generateHexMatrix(sizeX, sizeY, lastSide);
 				}
@@ -203,16 +211,16 @@ int main(){
 		}
 
 		window.clear();
-		window.draw(t);
-		window.draw(t2);
-		window.draw(t3);
-		window.draw(t4);
-		window.draw(t5);
-		window.draw(t6);
-		b0.draw(&window);
-		b1.draw(&window);
-		b2.draw(&window);
-		b3.draw(&window);
+		window.draw(debugModeLabel);
+		window.draw(ZoomLabel);
+		window.draw(addRowLabel);
+		window.draw(deleteRowLabel);
+		window.draw(addColLabel);
+		window.draw(deleteColLabel);
+		addRowButton.draw(&window);
+		deleteRowButton.draw(&window);
+		addColButton.draw(&window);
+		deleteColButton.draw(&window);
 		chk.draw(&window);
 		scroll.draw(&window);
 		for (int i = 0; i < hexTileMap.size(); ++i){
